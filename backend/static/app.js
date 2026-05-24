@@ -485,39 +485,62 @@ addItemForm.addEventListener("submit", async (e) => {
 });
 
 // Scan Modal Open/Close handlers
-btnOpenScan.addEventListener("click", () => {
-    scanUploadModal.classList.remove("hidden");
-});
+if (btnOpenScan) {
+    btnOpenScan.addEventListener("click", (e) => {
+        e.preventDefault();
+        console.log("Opening scan upload modal...");
+        if (scanUploadModal) {
+            scanUploadModal.classList.remove("hidden");
+        }
+    });
+}
 
-btnCloseScanModal.addEventListener("click", () => {
-    scanUploadModal.classList.add("hidden");
-});
+if (btnCloseScanModal) {
+    btnCloseScanModal.addEventListener("click", (e) => {
+        e.preventDefault();
+        console.log("Closing scan upload modal...");
+        if (scanUploadModal) {
+            scanUploadModal.classList.add("hidden");
+        }
+    });
+}
 
 // Image Upload / Drag and Drop handlers
-dropzone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropzone.classList.add("dragover");
-});
+if (dropzone) {
+    dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzone.classList.add("dragover");
+    });
 
-dropzone.addEventListener("dragleave", () => {
-    dropzone.classList.remove("dragover");
-});
+    dropzone.addEventListener("dragleave", () => {
+        dropzone.classList.remove("dragover");
+    });
 
-dropzone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    dropzone.classList.remove("dragover");
-    const file = e.dataTransfer.files[0];
-    if (file) handleImageFile(file);
-});
+    dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropzone.classList.remove("dragover");
+        const file = e.dataTransfer.files[0];
+        if (file) handleImageFile(file);
+    });
 
-dropzone.addEventListener("click", () => {
-    fileUpload.click();
-});
+    dropzone.addEventListener("click", (e) => {
+        // Prevent click recursion if clicking children
+        if (e.target !== fileUpload && fileUpload) {
+            fileUpload.click();
+        }
+    });
+}
 
-fileUpload.addEventListener("change", () => {
-    const file = fileUpload.files[0];
-    if (file) handleImageFile(file);
-});
+if (fileUpload) {
+    fileUpload.addEventListener("click", (e) => {
+        e.stopPropagation(); // Stop click event bubbling to dropzone
+    });
+
+    fileUpload.addEventListener("change", () => {
+        const file = fileUpload.files[0];
+        if (file) handleImageFile(file);
+    });
+}
 
 async function handleImageFile(file) {
     if (!file.type.match("image/jpeg") && !file.type.match("image/png")) {
