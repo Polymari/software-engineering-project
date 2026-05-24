@@ -1,0 +1,15 @@
+# Local environment configurations (contains API keys)
+.env
+
+# SQLite Databases (contains registered users and inventory logs)
+*.db
+*.sqlite3
+
+# Python environment and compilation caches
+.venv/
+__pycache__/
+*.pyc
+
+# IDE / Editor configuration files
+.vscode/
+.idea/
