@@ -165,11 +165,11 @@ class TestKulkasPintarAPI(unittest.TestCase):
         self.assertTrue(any(item["name"] == "Cheddar Cheese" for item in resp.json()))
         self.assertFalse(any(item["name"] == "Tomatoes" for item in resp.json()))
 
-        # 4. Both join Room "kitchen123"
+        # 4. User 1 joins Room "kitchen123" and invites User 2 by email
         resp = client.post(f"/api/v1/rooms/join?token={self.token_1}", json={"room_id": "kitchen123"})
         self.assertEqual(resp.status_code, 200)
         
-        resp = client.post(f"/api/v1/rooms/join?token={self.token_2}", json={"room_id": "kitchen123"})
+        resp = client.post(f"/api/v1/rooms/invite?token={self.token_1}", json={"email": self.test_email_2})
         self.assertEqual(resp.status_code, 200)
 
         # 5. Check merged inventory (user 1 should now see tomatoes, and user 2 should see cheddar cheese!)

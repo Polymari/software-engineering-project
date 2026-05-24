@@ -55,6 +55,9 @@ class InventoryItemOut(BaseModel):
 class SharedRoomJoin(BaseModel):
     room_id: str
 
+class SharedRoomInvite(BaseModel):
+    email: EmailStr
+
 class SharedRoomOut(BaseModel):
     id: int
     room_id: str

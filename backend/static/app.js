@@ -54,6 +54,13 @@ const roomInputId = document.getElementById("room-input-id");
 const btnCloseRoom = document.getElementById("btn-close-room");
 const btnGenerateRoom = document.getElementById("btn-generate-room");
 
+const roomJoinView = document.getElementById("room-join-view");
+const roomMembersView = document.getElementById("room-members-view");
+const activeRoomSlug = document.getElementById("active-room-slug");
+const roomMembersList = document.getElementById("room-members-list");
+const inviteMemberForm = document.getElementById("invite-member-form");
+const inviteEmail = document.getElementById("invite-email");
+
 const confirmLoggingModal = document.getElementById("confirm-logging-modal");
 const confirmItemsTbody = document.getElementById("confirm-items-tbody");
 const btnCancelLogging = document.getElementById("btn-cancel-logging");
@@ -291,6 +298,7 @@ dietForm.addEventListener("submit", async (e) => {
 });
 
 // Collaborative Room actions
+// Collaborative Room actions
 async function fetchRoomStatus() {
     try {
         activeRoom = await apiRequest(`/api/v1/rooms/active?token=${token}`);
@@ -298,10 +306,32 @@ async function fetchRoomStatus() {
             roomStatus.classList.remove("hidden");
             roomIdDisplay.innerText = activeRoom.room_id;
             roomMembersCount.innerText = `(${activeRoom.members.length} members)`;
-            btnJoinRoomModal.innerText = "Switch Room";
+            btnJoinRoomModal.innerText = "Workspace Room";
+            
+            // Switch modal view to manage members
+            roomJoinView.classList.add("hidden");
+            roomMembersView.classList.remove("hidden");
+            activeRoomSlug.innerText = activeRoom.room_id;
+            
+            // Render workspace members list
+            roomMembersList.innerHTML = "";
+            activeRoom.members.forEach(member => {
+                const item = document.createElement("div");
+                item.className = "py-2 px-2.5 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-between text-xs text-slate-700 mt-1.5 shadow-sm";
+                const isMe = currentUser && member.email === currentUser.email;
+                item.innerHTML = `
+                    <span class="font-mono truncate">${member.email}</span>
+                    ${isMe ? '<span class="text-[9px] px-1.5 py-0.5 bg-teal-50 border border-teal-150/40 text-teal-650 font-bold rounded-full">You</span>' : ''}
+                `;
+                roomMembersList.appendChild(item);
+            });
         } else {
             roomStatus.classList.add("hidden");
             btnJoinRoomModal.innerText = "Connect Room";
+            
+            // Switch modal view to join
+            roomJoinView.classList.remove("hidden");
+            roomMembersView.classList.add("hidden");
         }
     } catch (err) {
         console.error("Failed to fetch room status:", err);
@@ -328,6 +358,22 @@ joinRoomForm.addEventListener("submit", async (e) => {
 
     await joinCollaborativeRoom(rId);
     joinRoomModal.classList.add("hidden");
+});
+
+inviteMemberForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = inviteEmail.value.trim();
+    if (!email) return;
+
+    try {
+        await apiRequest(`/api/v1/rooms/invite?token=${token}`, "POST", { email });
+        showToast(`Added ${email} to workspace!`, "success");
+        inviteEmail.value = "";
+        await fetchRoomStatus();
+        await fetchInventory(); // Refresh merged items list immediately
+    } catch (err) {
+        console.error("Failed to invite member:", err);
+    }
 });
 
 async function joinCollaborativeRoom(roomId) {

@@ -226,6 +226,44 @@ def get_active_room(token: str, db: Session = Depends(database.get_db)):
         "members": members
     }
 
+@app.post("/api/v1/rooms/invite")
+def invite_to_room(
+    token: str,
+    invite: schemas.SharedRoomInvite,
+    db: Session = Depends(database.get_db)
+):
+    user = get_current_user(token, db)
+    active_room = db.query(models.SharedRoom).filter(models.SharedRoom.user_id == user.id).first()
+    if not active_room:
+        raise HTTPException(
+            status_code=400,
+            detail="You are not in an active room. Connect to a room first to invite members."
+        )
+    
+    target_user = db.query(models.User).filter(models.User.email == invite.email).first()
+    if not target_user:
+        raise HTTPException(
+            status_code=404,
+            detail=f"User with email {invite.email} not found. They must register an account first."
+        )
+        
+    in_same_room = db.query(models.SharedRoom).filter(
+        models.SharedRoom.user_id == target_user.id,
+        models.SharedRoom.room_id == active_room.room_id
+    ).first()
+    if in_same_room:
+        return {"message": f"{invite.email} is already in the room"}
+        
+    db.query(models.SharedRoom).filter(models.SharedRoom.user_id == target_user.id).delete()
+    
+    new_room_link = models.SharedRoom(
+        room_id=active_room.room_id,
+        user_id=target_user.id
+    )
+    db.add(new_room_link)
+    db.commit()
+    return {"message": f"Successfully added {invite.email} to room {active_room.room_id}"}
+
 # Helper to fetch merged inventory items
 def fetch_user_inventory(user: models.User, db: Session) -> List[models.InventoryItem]:
     # Check if user is in an active room

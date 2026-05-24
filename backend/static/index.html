@@ -312,26 +312,66 @@
         </div>
     </div>
 
-    <!-- MODAL: Join Room Collaboration -->
+    <!-- MODAL: Join Room Collaboration & Members Management -->
     <div id="join-room-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-        <div class="bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 relative">
+            <!-- Close Button -->
+            <button id="btn-close-room" class="absolute top-4 right-4 text-slate-400 hover:text-slate-650 cursor-pointer">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+
             <div>
-                <h3 class="text-base font-bold text-slate-800">Collaborative Room Link</h3>
-                <p class="text-xs text-slate-500">Join a shared session to temporarily merge digital inventories.</p>
+                <h3 id="room-modal-title" class="text-base font-bold text-slate-800">Workspace Room</h3>
+                <p class="text-xs text-slate-500">Manage your shared inventory and workspace members.</p>
             </div>
-            <form id="join-room-form" class="space-y-4 text-xs">
-                <div>
-                    <label class="block font-semibold text-slate-600 mb-1">Room ID / Slug</label>
-                    <input type="text" id="room-input-id" required placeholder="e.g. kitchen456" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500">
+
+            <!-- View 1: Join / Create Room (Shown if not in a room) -->
+            <div id="room-join-view" class="space-y-4">
+                <form id="join-room-form" class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Room ID / Slug</label>
+                        <input type="text" id="room-input-id" required placeholder="e.g. kitchen456" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500">
+                    </div>
+                    <button type="submit" class="w-full py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl shadow-md transition cursor-pointer">
+                        Connect Room
+                    </button>
+                </form>
+                <div class="pt-2 border-t border-slate-100 text-center">
+                    <span class="text-[10px] text-slate-550 block mb-2">Want to start a new workspace?</span>
+                    <button id="btn-generate-room" class="text-xs font-semibold text-teal-650 hover:text-teal-700 hover:underline cursor-pointer">Generate Random Room</button>
                 </div>
-                <div class="flex gap-2">
-                    <button type="button" id="btn-close-room" class="flex-1 py-2.5 bg-white hover:bg-slate-50 text-slate-600 font-semibold rounded-xl border border-slate-200 transition cursor-pointer">Cancel</button>
-                    <button type="submit" class="flex-1 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl shadow-md transition cursor-pointer">Join Room</button>
+            </div>
+
+            <!-- View 2: Manage Room Members (Shown when activeRoom.in_room is true) -->
+            <div id="room-members-view" class="space-y-4 hidden">
+                <div class="bg-teal-50 border border-teal-200/50 rounded-xl p-3 text-xs">
+                    <div class="flex items-center justify-between font-semibold text-teal-850">
+                        <span>Connected Room:</span>
+                        <span id="active-room-slug" class="font-mono text-teal-650 font-bold uppercase">none</span>
+                    </div>
                 </div>
-            </form>
-            <div class="pt-2 border-t border-slate-200 text-center">
-                <span class="text-[10px] text-slate-550 block mb-2">Want to start a new workspace?</span>
-                <button id="btn-generate-room" class="text-xs font-semibold text-teal-650 hover:text-teal-700 hover:underline cursor-pointer">Generate Random Room</button>
+
+                <div class="space-y-2">
+                    <span class="text-xs font-bold text-slate-700 block">Workspace Members</span>
+                    <div id="room-members-list" class="max-h-32 overflow-y-auto space-y-1.5 pr-1 divide-y divide-slate-100 text-xs">
+                        <!-- Render members here -->
+                    </div>
+                </div>
+
+                <!-- Invite Member Form -->
+                <form id="invite-member-form" class="space-y-3 text-xs pt-2 border-t border-slate-100">
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Add Member by Email</label>
+                        <div class="flex gap-2">
+                            <input type="email" id="invite-email" required placeholder="member@example.com" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500">
+                            <button type="submit" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl shadow-md transition cursor-pointer shrink-0">
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
