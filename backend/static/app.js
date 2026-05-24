@@ -36,6 +36,10 @@ const btnCloseDiet = document.getElementById("btn-close-diet");
 const toggleStrictMatch = document.getElementById("toggle-strict-match");
 const toggleSaveFood = document.getElementById("toggle-save-food");
 
+const scanUploadModal = document.getElementById("scan-upload-modal");
+const btnOpenScan = document.getElementById("btn-open-scan");
+const btnCloseScanModal = document.getElementById("btn-close-scan-modal");
+
 const dropzone = document.getElementById("dropzone");
 const fileUpload = document.getElementById("file-upload");
 
@@ -480,6 +484,15 @@ addItemForm.addEventListener("submit", async (e) => {
     }
 });
 
+// Scan Modal Open/Close handlers
+btnOpenScan.addEventListener("click", () => {
+    scanUploadModal.classList.remove("hidden");
+});
+
+btnCloseScanModal.addEventListener("click", () => {
+    scanUploadModal.classList.add("hidden");
+});
+
 // Image Upload / Drag and Drop handlers
 dropzone.addEventListener("dragover", (e) => {
     e.preventDefault();
@@ -541,6 +554,7 @@ async function handleImageFile(file) {
         // Present discovered ingredients to user for manual validation
         detectedIngredients = data.ingredients;
         showConfirmLoggingModal();
+        scanUploadModal.classList.add("hidden");
     } catch (err) {
         console.error("Scan analysis failed:", err);
         showToast(err.message, "error");
