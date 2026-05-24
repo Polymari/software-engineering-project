@@ -548,6 +548,11 @@ async function handleImageFile(file) {
         return;
     }
 
+    // Close the scan upload modal immediately since analysis is starting
+    if (scanUploadModal) {
+        scanUploadModal.classList.add("hidden");
+    }
+
     // Prepare FormData
     const formData = new FormData();
     formData.append("token", token);
@@ -577,7 +582,6 @@ async function handleImageFile(file) {
         // Present discovered ingredients to user for manual validation
         detectedIngredients = data.ingredients;
         showConfirmLoggingModal();
-        scanUploadModal.classList.add("hidden");
     } catch (err) {
         console.error("Scan analysis failed:", err);
         showToast(err.message, "error");
